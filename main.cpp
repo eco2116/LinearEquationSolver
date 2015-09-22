@@ -13,8 +13,8 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	if (argc!=2) {
-		perror("Usage: ./main input_file");
+	if (argc!=3) {
+		perror("Usage: ./main input_file output_file");
 		exit(1);
 	}
 	
@@ -23,31 +23,28 @@ int main(int argc, char* argv[])
 	int m=0;
 	int n=0;
 	infile>>m>>n;
-	Matrix A(m,n);	
-	Matrix B(n,1);
+	Matrix Ab(m,n+1);
 	double element;
 	
 	int i, j;
-	for (i=0; i<n; ++i)
+	for (i=0; i<m; ++i)
 	{
-		for (j=0; j<m; ++j)
+		for (j=0; j<n+1; ++j)
 		{
 			infile>>element;
-			A = A.insertElement(i,j,element);
+			Ab = Ab.insertElement(i,j,element);
 		}
-	}
-	for (i=0; i<n; ++i)
-	{
-		infile>>element;
-		B = B.insertElement(i,0,element);
 	}
 
 	
-	Matrix Ab = Matrix::augment(A,B);
+
+
 	Matrix gauss = Ab.gaussianElim();
 	Matrix rref = gauss.rrefFromGauss();
-	cout << rref << endl;
-	//rref.solutionsFromRREF(cout);
-	
+	ofstream outfile;
+	outfile.open(argv[2]);
+	rref.solutionsFromRREF(outfile);
+	infile.close();
+	outfile.close();
 
 }

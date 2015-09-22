@@ -193,11 +193,11 @@ Matrix Matrix::augment(Matrix A, Matrix B)
 	Matrix aug(A.mRows, A.mCols + B.mCols);
 	for (int i=0; i<aug.mRows; ++i) {
 		for(int j=0; j<aug.mCols; ++j) {
-			if (j<A.mCols)
-				aug.m[i][j]=A.m[i][j];
-			else
-				aug.m[i][j]=B.m[i][j-B.mCols];
+			aug.m[i][j] = A.m[i][j];
 		}
+	}
+	for (int i=0; i<B.mRows; ++i) {
+		aug.m[i][A.mCols+1] = B.m[i][1];
 	}
 	return aug;
 }
@@ -269,7 +269,7 @@ Matrix Matrix::rrefFromGauss()
 	{
 		int k=col_track-1;
 		while (k>=0) {
-			if (rref.m[row_track][col_track]!=0)
+			if (rref.m[row_track][k]!=0)
 				col_track = k;
 			k--;
 		}
@@ -320,12 +320,12 @@ void Matrix::solutionsFromRREF(ostream& os)
 	}
 	if (!finished)
 		os << "Unique solution" << endl << endl;
-	bool[mCols-1] frees = {};
+	bool frees[mCols-1];
 	if (hasSol) {
 		Matrix p(mCols-1, 1);
-		Matrix s(mCols-1, 1);
+		
 	
-		int count = 0;
+
 		for (int i=0; i<mRows; ++i) {
 			bool pivot = false;
 			
@@ -342,28 +342,24 @@ void Matrix::solutionsFromRREF(ostream& os)
 			}
 		}
 		os << "Particular solution:" << endl << p << endl;
-		for (int i=0; i<mCols-1; ++i) {
-			if (frees[i]) {
-				s.m[i][0] = 1;
-				for (int j=0; j<mCols-1; ++j) {
-					if (!frees[j]) {
-						for (int k=0; k<mRows; ++k) {
-							if (s.m[j][k] == 1) {
-								s.m[j][0] = sol.m[k][i]*-1;
+		for (int j=0; j<mCols-1; j++) {
+			if (frees[j]) {
+				Matrix s(mCols-1,1);
+				s.m[j][0] = 1;
+				for (int k=0; k<mCols-1; k++) {
+					if (!frees[k]) {
+						
+						for (int l=0; l<mRows; l++) {
+							if (sol.m[k][l] == 1) {
+								
+								s.m[k][0] = (-1*sol.m[l][j]);
 							}
 						}
+						
 					}
 				}
+				os << "Special solution:" << endl << s << endl;
 			}
 		}
 	}
-}
-
-
-
-
-			
-
-
-
 }
